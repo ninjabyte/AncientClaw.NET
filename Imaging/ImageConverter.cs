@@ -58,7 +58,7 @@ namespace Claw.Imaging
         {
             if (args.Result != null) {
                 if (ProgressCompleted != null)
-                    ProgressCompleted(this, new ProgressCompletedEventArgs((Image)args.Result, startTime - DateTime.Now));
+                    ProgressCompleted(this, new ProgressCompletedEventArgs((Image)args.Result, DateTime.Now - startTime));
             } else {
                 if (ProgressCompleted != null)
                     ProgressCompleted(this, new ProgressCompletedEventArgs());
