@@ -10,9 +10,10 @@ namespace Claw.Imaging.Palettes
 {
     public class FullPalette : IPalette
     {
-        private RGB565[] entries;
+        private RGB565[] rgb_entries;
+        private CIELab[] lab_entries;
 
-        public byte Size { get { return (byte)entries.Length; } }
+        public byte Size { get { return (byte)rgb_entries.Length; } }
 
         public static IPalette Default
         {
@@ -24,7 +25,8 @@ namespace Claw.Imaging.Palettes
 
         public FullPalette(byte Size)
         {
-            entries = new RGB565[Size];
+            rgb_entries = new RGB565[Size];
+            lab_entries = new CIELab[Size];
         }
 
         public FullPalette(System.Drawing.Image PaletteImage)
@@ -35,11 +37,14 @@ namespace Claw.Imaging.Palettes
                 throw new OverflowException("Too many palette entries! Maximum is 256.");
 
             var bmp = new Bitmap(PaletteImage);
-            entries = new RGB565[PaletteImage.Width * PaletteImage.Height];
+            rgb_entries = new RGB565[PaletteImage.Width * PaletteImage.Height];
+            lab_entries = new CIELab[PaletteImage.Width * PaletteImage.Height];
 
             for (int x = 0; x < bmp.Width; x++) {
-                for (int y = 0; y < bmp.Height; y++)
-                    entries[y * bmp.Width + x] = new RGB565(bmp.GetPixel(x, y));
+                for (int y = 0; y < bmp.Height; y++) {
+                    rgb_entries[y * bmp.Width + x] = new RGB565(bmp.GetPixel(x, y));
+                    lab_entries[y * bmp.Width + x] = new CIELab(bmp.GetPixel(x, y));
+                }
             }
         }
 
@@ -47,12 +52,13 @@ namespace Claw.Imaging.Palettes
         {
             get
             {
-                return entries[Index];
+                return rgb_entries[Index];
             }
 
             set
             {
-                entries[Index] = value;
+                rgb_entries[Index] = value;
+                lab_entries[Index] = new CIELab(value.Color);
             }
         }
 
@@ -68,8 +74,7 @@ namespace Claw.Imaging.Palettes
             double closestDeltaE = 0d;
 
             for (int i = 0; i < Size; i++) {
-                CIELab color = new CIELab(this[(byte)i].Color);
-                double deltaE = searchColor.CalculateDeltaE(color);
+                double deltaE = searchColor.CalculateDeltaE(lab_entries[i]);
 
                 if (Math.Abs(deltaE) < Math.Abs(closestDeltaE) || i == 0) {
                     closestPaletteEntry = (byte)i;
