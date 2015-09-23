@@ -23,7 +23,6 @@ namespace Claw.Imaging.Colorspaces
         public CIELab(Color Color)
             : this(Color.R, Color.G, Color.B)
         {
-
         }
 
         public Color ToRGB()

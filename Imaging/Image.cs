@@ -5,6 +5,7 @@ using System.Text;
 using System.Drawing;
 using System.IO;
 using Claw.Imaging.Colorspaces;
+using Claw.Imaging.Palettes;
 
 namespace Claw.Imaging
 {
@@ -33,13 +34,13 @@ namespace Claw.Imaging
 
         }
 
-        public System.Drawing.Image ToImage(Palette Palette)
+        public System.Drawing.Image ToImage(FullPalette Palette)
         {
             var bmp = new Bitmap((int)Width, (int)Height);
 
             for (int x = 0; x < Width; x++) {
                 for (int y = 0; y < Height; y++) {
-                    bmp.SetPixel(x, y, Palette.GetColorAt(Data[y * Width + x]));
+                    bmp.SetPixel(x, y, Palette[Data[y * Width + x]].Color);
                 }
             }
 
@@ -49,7 +50,7 @@ namespace Claw.Imaging
         public enum PixelFormat : byte
         {
             Monochrome1bit,
-            Grayscale4bit,
+            Palette4bit,
             Palette8bit,
             RGB16bit
         }

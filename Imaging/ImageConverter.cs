@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using System.ComponentModel;
 using System.Drawing;
+using Claw.Imaging.Colorspaces;
+using Claw.Imaging.Palettes;
 
 
 namespace Claw.Imaging
@@ -36,10 +38,10 @@ namespace Claw.Imaging
 
             if (conversionArgs.TargetFormat == Image.PixelFormat.Monochrome1bit) {
                 args.Result = ConvertToMonochrome1bpp(conversionArgs.SourceImage, worker);
-            } else if (conversionArgs.TargetFormat == Image.PixelFormat.Grayscale4bit) {
-                args.Result = ConvertToGrayscale4bpp(conversionArgs.SourceImage, worker);
+            } else if (conversionArgs.TargetFormat == Image.PixelFormat.Palette4bit) {
+                args.Result = ConvertToPalette4bpp(conversionArgs.SourceImage, (TinyPalette)conversionArgs.Palette, worker);
             } else if (conversionArgs.TargetFormat == Image.PixelFormat.Palette8bit) {
-                args.Result = ConvertToPalette8bpp(conversionArgs.SourceImage, conversionArgs.Palette, worker);
+                args.Result = ConvertToPalette8bpp(conversionArgs.SourceImage, (FullPalette)conversionArgs.Palette, worker);
             } else if (conversionArgs.TargetFormat == Image.PixelFormat.RGB16bit) {
                 args.Result = ConvertToRGB16bpp(conversionArgs.SourceImage, worker);
             } else
@@ -63,33 +65,20 @@ namespace Claw.Imaging
             }
         }
 
-        public void ConvertToMonochrome1bppAsync(System.Drawing.Image Image, Palette Palette)
+        public void ConvertToMonochrome1bppAsync(System.Drawing.Image Image, FullPalette Palette)
         {
             if (worker.IsBusy)
                 throw new InvalidOperationException("This instance is busy converting!");
             if (Image == null)
                 throw new ArgumentNullException("Image");
 
-            var args = new ConversionArgs(Imaging.Image.PixelFormat.Monochrome1bit, Image);
+            var args = ConversionArgs.Monochrome1bpp(Image);
             currentState = args;
             startTime = DateTime.Now;
             worker.RunWorkerAsync(args);
         }
 
-        public void ConvertToGrayscale4bppAsync(System.Drawing.Image Image)
-        {
-            if (worker.IsBusy)
-                throw new InvalidOperationException("This instance is busy converting!");
-            if (Image == null)
-                throw new ArgumentNullException("Image");
-
-            var args = new ConversionArgs(Imaging.Image.PixelFormat.Grayscale4bit, Image);
-            currentState = args;
-            startTime = DateTime.Now;
-            worker.RunWorkerAsync(args);
-        }
-
-        public void ConvertToPalette8bppAsync(System.Drawing.Image Image, Palette Palette)
+        public void ConvertToPalette4bppAsync(System.Drawing.Image Image, TinyPalette Palette)
         {
             if (worker.IsBusy)
                 throw new InvalidOperationException("This instance is busy converting!");
@@ -98,7 +87,22 @@ namespace Claw.Imaging
             if (Palette == null)
                 throw new ArgumentNullException("Palette");
 
-            var args = new ConversionArgs(Image, Palette);
+            var args = ConversionArgs.Palette4bpp(Image, Palette);
+            currentState = args;
+            startTime = DateTime.Now;
+            worker.RunWorkerAsync(args);
+        }
+
+        public void ConvertToPalette8bppAsync(System.Drawing.Image Image, FullPalette Palette)
+        {
+            if (worker.IsBusy)
+                throw new InvalidOperationException("This instance is busy converting!");
+            if (Image == null)
+                throw new ArgumentNullException("Image");
+            if (Palette == null)
+                throw new ArgumentNullException("Palette");
+
+            var args = ConversionArgs.Palette8bpp(Image, Palette);
             currentState = args;
             startTime = DateTime.Now;
             worker.RunWorkerAsync(args);
@@ -111,7 +115,7 @@ namespace Claw.Imaging
             if (Image == null)
                 throw new ArgumentNullException("Image");
 
-            var args = new ConversionArgs(Imaging.Image.PixelFormat.RGB16bit, Image);
+            var args = ConversionArgs.RGB16bpp(Image);
             currentState = args;
             startTime = DateTime.Now;
             worker.RunWorkerAsync(args);
@@ -139,7 +143,7 @@ namespace Claw.Imaging
                     bytes[y * (Image.Height / 8) + x] = pixelField;
 
                     if (Worker != null)
-                        Worker.ReportProgress(y * (Image.Height / 8) + x);
+                        Worker.ReportProgress(y);
                 }
             }
 
@@ -152,17 +156,38 @@ namespace Claw.Imaging
             return ConvertToMonochrome1bpp(Image, null);
         }
 
-        private static Image ConvertToGrayscale4bpp(System.Drawing.Image Image, BackgroundWorker Worker)
+        private static Image ConvertToPalette4bpp(System.Drawing.Image Image, TinyPalette Palette, BackgroundWorker Worker)
         {
-            return null;
+            // Allocate memory for the target image (2 pixel per byte)
+            var bytes = new byte[(Image.Width / 2) * Image.Height];
+            // Create a new bitmap copy of the image
+            var bmp = new Bitmap(Image);
+
+            // Loop through the pixels and find the closest approximation in the palette
+            for (int y = 0; y < Image.Height; y++) {
+                for (int x = 0; x < (Image.Width / 2); x++) {
+                    byte x1 = Palette.FindClosestEntry(bmp.GetPixel(x * 2, y));
+                    byte x2 = Palette.FindClosestEntry(bmp.GetPixel(x * 2 + 1, y));
+                    bytes[y * (Image.Width / 2) + x] = (byte)(((x1 & 0x0F) << 4) | (x2 & 0x0F));
+                }
+
+                if (Worker != null)
+                    Worker.ReportProgress(y);
+            }
+
+            // Clean up
+            bmp.Dispose();
+
+            // Create and return new image
+            return new Image(bytes, Imaging.Image.PixelFormat.Palette4bit, (uint)Image.Width, (uint)Image.Height);
         }
 
-        public static Image ConvertToGrayscale4bpp(System.Drawing.Image Image)
+        public static Image ConvertToPalette4bpp(System.Drawing.Image Image, TinyPalette Palette)
         {
-            return ConvertToGrayscale4bpp(Image, null);
+            return ConvertToPalette4bpp(Image, Palette, null);
         }
 
-        private static Image ConvertToPalette8bpp(System.Drawing.Image Image, Palette Palette, BackgroundWorker Worker)
+        private static Image ConvertToPalette8bpp(System.Drawing.Image Image, FullPalette Palette, BackgroundWorker Worker)
         {
             // Allocate memory for the target image
             var bytes = new byte[Image.Width * Image.Height];
@@ -171,9 +196,8 @@ namespace Claw.Imaging
 
             // Loop through the pixels and find the closest approximation in the palette
             for (int y = 0; y < Image.Height; y++) {
-                for (int x = 0; x < Image.Width; x++) {
+                for (int x = 0; x < Image.Width; x++)
                     bytes[y * Image.Width + x] = Palette.FindClosestEntry(bmp.GetPixel(x, y));
-                }
 
                 if (Worker != null)
                     Worker.ReportProgress(y);
@@ -186,14 +210,28 @@ namespace Claw.Imaging
             return new Image(bytes, Imaging.Image.PixelFormat.Palette8bit, (uint)Image.Width, (uint)Image.Height);
         }
 
-        public static Image ConvertToPalette8bpp(System.Drawing.Image Image, Palette Palette)
+        public static Image ConvertToPalette8bpp(System.Drawing.Image Image, FullPalette Palette)
         {
             return ConvertToPalette8bpp(Image, Palette, null);
         }
 
         private static Image ConvertToRGB16bpp(System.Drawing.Image Image, BackgroundWorker Worker)
         {
-            return null;
+            var bmp = new Bitmap(Image);
+            byte[] bytes = new byte[Image.Width * Image.Height * 2];
+
+            for (int y = 0; y < Image.Height; y++) {
+                for (int x = 0; x < Image.Width; x++) {
+                    byte[] pixelBytes = BitConverter.GetBytes(RGB565.PackValueFromColor(bmp.GetPixel(x, y)));
+                    bytes[(y * Image.Width + x) * 2] = pixelBytes[0];
+                    bytes[(y * Image.Width + x) * 2 + 1] = pixelBytes[1];
+                }
+
+                if (Worker != null)
+                    Worker.ReportProgress(y);
+            }
+
+            return new Image(bytes, Imaging.Image.PixelFormat.RGB16bit, (uint)Image.Width, (uint)Image.Height);
         }
 
         public static Image ConvertToRGB16bpp(System.Drawing.Image Image)
@@ -205,27 +243,33 @@ namespace Claw.Imaging
         {
             public Image.PixelFormat TargetFormat;
             public System.Drawing.Image SourceImage;
-            public Palette Palette;
+            public IPalette Palette;
 
-            public ConversionArgs(Image.PixelFormat TargetFormat, System.Drawing.Image SourceImage, Palette Palette)
+            private ConversionArgs(Image.PixelFormat TargetFormat, System.Drawing.Image SourceImage, IPalette Palette)
             {
                 this.TargetFormat = TargetFormat;
                 this.SourceImage = SourceImage;
                 this.Palette = Palette;
             }
 
-            public ConversionArgs(Image.PixelFormat TargetFormat, System.Drawing.Image SourceImage)
+            public static ConversionArgs Monochrome1bpp(System.Drawing.Image SourceImage)
             {
-                this.TargetFormat = TargetFormat;
-                this.SourceImage = SourceImage;
-                this.Palette = null;
+                return new ConversionArgs(Image.PixelFormat.Monochrome1bit, SourceImage, null);
             }
 
-            public ConversionArgs(System.Drawing.Image SourceImage, Palette Palette)
+            public static ConversionArgs Palette4bpp(System.Drawing.Image SourceImage, TinyPalette Palette)
             {
-                this.TargetFormat = Image.PixelFormat.Palette8bit;
-                this.SourceImage = SourceImage;
-                this.Palette = Palette;
+                return new ConversionArgs(Image.PixelFormat.Palette4bit, SourceImage, Palette);
+            }
+
+            public static ConversionArgs Palette8bpp(System.Drawing.Image SourceImage, FullPalette Palette)
+            {
+                return new ConversionArgs(Image.PixelFormat.Palette8bit, SourceImage, Palette);
+            }
+
+            public static ConversionArgs RGB16bpp(System.Drawing.Image SourceImage)
+            {
+                return new ConversionArgs(Image.PixelFormat.RGB16bit, SourceImage, null);
             }
         }
 
