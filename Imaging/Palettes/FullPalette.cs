@@ -15,7 +15,7 @@ namespace Claw.Imaging.Palettes
 
         public byte Size { get { return (byte)rgb_entries.Length; } }
 
-        public static IPalette Default
+        public static FullPalette DefaultColors
         {
             get
             {
