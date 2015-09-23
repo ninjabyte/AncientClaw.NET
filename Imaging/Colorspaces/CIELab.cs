@@ -33,7 +33,8 @@ namespace Claw.Imaging.Colorspaces
 
         public static double CalculateDeltaE(CIELab p, CIELab v)
         {
-            return Math.Sqrt(Math.Pow(p.L - v.L, 2) + Math.Pow(p.a - v.a, 2) + Math.Pow(p.b - v.b, 2));
+            //return Math.Sqrt(Math.Pow(p.L - v.L, 2) + Math.Pow(p.a - v.a, 2) + Math.Pow(p.b - v.b, 2));
+            return ((p.L - v.L) * (p.L - v.L) + (p.a - v.a) * (p.a - v.a) + (p.b - v.b) * (p.b - v.b)); // faster
         }
 
         public double CalculateDeltaE(CIELab v)

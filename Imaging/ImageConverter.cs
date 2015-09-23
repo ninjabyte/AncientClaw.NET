@@ -14,6 +14,7 @@ namespace Claw.Imaging
     {
         private BackgroundWorker worker;
         private ConversionArgs currentState;
+        private Size currentImageSize;
         private DateTime startTime;
 
         public bool IsBusy { get { return worker.IsBusy; } }
@@ -51,7 +52,7 @@ namespace Claw.Imaging
         private void worker_ProgressChanged(object sender, System.ComponentModel.ProgressChangedEventArgs args)
         {
             if (ProgressChanged != null)
-                ProgressChanged(this, new ProgressChangedEventArgs((uint)args.ProgressPercentage, (uint)currentState.SourceImage.Height, DateTime.Now - startTime));
+                    ProgressChanged(this, new ProgressChangedEventArgs((uint)args.ProgressPercentage, (uint)currentImageSize.Height, DateTime.Now - startTime));
         }
 
         private void worker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs args)
@@ -74,6 +75,7 @@ namespace Claw.Imaging
 
             var args = ConversionArgs.Monochrome1bpp(Image);
             currentState = args;
+            currentImageSize = Image.Size;
             startTime = DateTime.Now;
             worker.RunWorkerAsync(args);
         }
@@ -89,6 +91,7 @@ namespace Claw.Imaging
 
             var args = ConversionArgs.Palette4bpp(Image, Palette);
             currentState = args;
+            currentImageSize = Image.Size;
             startTime = DateTime.Now;
             worker.RunWorkerAsync(args);
         }
@@ -104,6 +107,7 @@ namespace Claw.Imaging
 
             var args = ConversionArgs.Palette8bpp(Image, Palette);
             currentState = args;
+            currentImageSize = Image.Size;
             startTime = DateTime.Now;
             worker.RunWorkerAsync(args);
         }
@@ -117,6 +121,7 @@ namespace Claw.Imaging
 
             var args = ConversionArgs.RGB16bpp(Image);
             currentState = args;
+            currentImageSize = Image.Size;
             startTime = DateTime.Now;
             worker.RunWorkerAsync(args);
         }
@@ -239,7 +244,7 @@ namespace Claw.Imaging
             return ConvertToRGB16bpp(Image, null);
         }
 
-        private struct ConversionArgs
+        private class ConversionArgs
         {
             public Image.PixelFormat TargetFormat;
             public System.Drawing.Image SourceImage;

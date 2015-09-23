@@ -7,7 +7,7 @@ using System.Text;
 using System.IO;
 using System.Media;
 
-namespace Claw.Audio.Formats
+namespace Claw.Audio.Codecs
 {
     public class Wave
     {

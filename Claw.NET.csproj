@@ -43,7 +43,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Audio\Audio.cs" />
-    <Compile Include="Audio\Formats\Wave.cs" />
+    <Compile Include="Audio\Codecs\Wave.cs" />
     <Compile Include="Imaging\Colorspaces\CIELab.cs" />
     <Compile Include="Imaging\Colorspaces\RGB565.cs" />
     <Compile Include="Imaging\Image.cs" />

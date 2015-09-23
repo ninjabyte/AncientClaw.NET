@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.IO;
-using Claw.Audio.Formats;
+using Claw.Audio.Codecs;
 
 namespace Claw.Audio
 {
