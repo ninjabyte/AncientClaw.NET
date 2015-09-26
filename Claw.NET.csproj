@@ -44,10 +44,14 @@
   <ItemGroup>
     <Compile Include="Audio\Audio.cs" />
     <Compile Include="Audio\Codecs\Wave.cs" />
+    <Compile Include="Imaging\ColorConverter.cs" />
     <Compile Include="Imaging\Colorspaces\CIELab.cs" />
     <Compile Include="Imaging\Colorspaces\RGB565.cs" />
-    <Compile Include="Imaging\Image.cs" />
+    <Compile Include="Imaging\Colorspaces\RGB888.cs" />
+    <Compile Include="Imaging\IImage.cs" />
+    <Compile Include="Imaging\PaletteImage.cs" />
     <Compile Include="Imaging\ImageConverter.cs" />
+    <Compile Include="Imaging\MemoryBitmap.cs" />
     <Compile Include="Imaging\Palettes\TinyPalette.cs" />
     <Compile Include="Imaging\Palettes\FullPalette.cs" />
     <Compile Include="Imaging\Palettes\IPalette.cs" />
