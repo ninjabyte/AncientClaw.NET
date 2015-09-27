@@ -4,13 +4,13 @@ using System.Linq;
 using System.Text;
 using System.Drawing;
 using System.Drawing.Imaging;
+using Claw.Imaging.Palettes;
 
 namespace Claw.Imaging
 {
     public class ColorConverter
     {
-        int[] pal, src, dst;
-        int width, height;
+        private IPalette Palette;
 
         /* public ColorConverter(String ifile)
          {
@@ -25,10 +25,26 @@ namespace Claw.Imaging
              dst = new int[src.length]; // the alpha component of the dst image is used to store the color's index on the palette.
          }*/
 
-        public ColorConverter(System.Drawing.Image Image)
+        public ColorConverter(IPalette Palette)
         {
-            MemoryBitmap mbmp = new MemoryBitmap(Image);
-            mbmp.Lock();
+            
+
+           
+
+            this.Palette = Palette;
+        }
+
+        public void GenerateImage(System.Drawing.Image Image, IImage TargetImage)
+        {
+            var sourceBitmap = new MemoryBitmap(Image);
+            sourceBitmap.Lock();
+
+            uint width = (uint)Image.Width;
+            uint height = (uint)Image.Height;
+
+            
+
+            return targetImage;
         }
 
         /*

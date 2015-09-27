@@ -55,6 +55,7 @@
     <Compile Include="Imaging\Palettes\TinyPalette.cs" />
     <Compile Include="Imaging\Palettes\FullPalette.cs" />
     <Compile Include="Imaging\Palettes\IPalette.cs" />
+    <Compile Include="Imaging\PixelFormat.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
