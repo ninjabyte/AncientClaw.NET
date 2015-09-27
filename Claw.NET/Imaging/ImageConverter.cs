@@ -1,4 +1,6 @@
-﻿using System;
+﻿
+
+/*using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -37,13 +39,13 @@ namespace Claw.Imaging
         {
             var conversionArgs = (ConversionArgs)args.Argument;
 
-            if (conversionArgs.TargetFormat == Image.PixelFormat.Monochrome1bit) {
+            if (conversionArgs.TargetFormat == PaletteImage_old.PixelFormat.Monochrome1bit) {
                 args.Result = ConvertToMonochrome1bpp(conversionArgs.SourceImage, worker);
-            } else if (conversionArgs.TargetFormat == Image.PixelFormat.Palette4bit) {
+            } else if (conversionArgs.TargetFormat == PaletteImage_old.PixelFormat.Palette4bit) {
                 args.Result = ConvertToPalette4bpp(conversionArgs.SourceImage, (TinyPalette)conversionArgs.Palette, worker);
-            } else if (conversionArgs.TargetFormat == Image.PixelFormat.Palette8bit) {
+            } else if (conversionArgs.TargetFormat == PaletteImage_old.PixelFormat.Palette8bit) {
                 args.Result = ConvertToPalette8bpp(conversionArgs.SourceImage, (FullPalette)conversionArgs.Palette, worker);
-            } else if (conversionArgs.TargetFormat == Image.PixelFormat.RGB16bit) {
+            } else if (conversionArgs.TargetFormat == PaletteImage_old.PixelFormat.RGB16bit) {
                 args.Result = ConvertToRGB16bpp(conversionArgs.SourceImage, worker);
             } else
                 args.Result = null;
@@ -59,7 +61,7 @@ namespace Claw.Imaging
         {
             if (args.Result != null) {
                 if (ProgressCompleted != null)
-                    ProgressCompleted(this, new ProgressCompletedEventArgs((Image)args.Result, DateTime.Now - startTime));
+                    ProgressCompleted(this, new ProgressCompletedEventArgs((PaletteImage_old)args.Result, DateTime.Now - startTime));
             } else {
                 if (ProgressCompleted != null)
                     ProgressCompleted(this, new ProgressCompletedEventArgs());
@@ -126,7 +128,7 @@ namespace Claw.Imaging
             worker.RunWorkerAsync(args);
         }
 
-        private static Image ConvertToMonochrome1bpp(System.Drawing.Image Image, BackgroundWorker Worker)
+        private static PaletteImage_old ConvertToMonochrome1bpp(System.Drawing.Image Image, BackgroundWorker Worker)
         {
             // Allocate size for the image (1 byte per 8 pixel)
             var bytes = new byte[(Image.Width / 8) * Image.Height];
@@ -153,15 +155,15 @@ namespace Claw.Imaging
             }
 
             // Return the final image
-            return new Image(bytes, Imaging.Image.PixelFormat.Monochrome1bit, (uint)Image.Width, (uint)Image.Height);
+            return new PaletteImage_old(bytes, Imaging.PaletteImage_old.PixelFormat.Monochrome1bit, (uint)Image.Width, (uint)Image.Height);
         }
 
-        public static Image ConvertToMonochrome1bpp(System.Drawing.Image Image)
+        public static PaletteImage_old ConvertToMonochrome1bpp(System.Drawing.Image Image)
         {
             return ConvertToMonochrome1bpp(Image, null);
         }
 
-        private static Image ConvertToPalette4bpp(System.Drawing.Image Image, TinyPalette Palette, BackgroundWorker Worker)
+        private static PaletteImage_old ConvertToPalette4bpp(System.Drawing.Image Image, TinyPalette Palette, BackgroundWorker Worker)
         {
             // Allocate memory for the target image (2 pixel per byte)
             var bytes = new byte[(Image.Width / 2) * Image.Height];
@@ -184,15 +186,15 @@ namespace Claw.Imaging
             bmp.Dispose();
 
             // Create and return new image
-            return new Image(bytes, Imaging.Image.PixelFormat.Palette4bit, (uint)Image.Width, (uint)Image.Height);
+            return new PaletteImage_old(bytes, Imaging.PaletteImage_old.PixelFormat.Palette4bit, (uint)Image.Width, (uint)Image.Height);
         }
 
-        public static Image ConvertToPalette4bpp(System.Drawing.Image Image, TinyPalette Palette)
+        public static PaletteImage_old ConvertToPalette4bpp(System.Drawing.Image Image, TinyPalette Palette)
         {
             return ConvertToPalette4bpp(Image, Palette, null);
         }
 
-        private static Image ConvertToPalette8bpp(System.Drawing.Image Image, FullPalette Palette, BackgroundWorker Worker)
+        private static PaletteImage_old ConvertToPalette8bpp(System.Drawing.Image Image, FullPalette Palette, BackgroundWorker Worker)
         {
             // Allocate memory for the target image
             var bytes = new byte[Image.Width * Image.Height];
@@ -212,15 +214,15 @@ namespace Claw.Imaging
             bmp.Dispose();
 
             // Create and return new image
-            return new Image(bytes, Imaging.Image.PixelFormat.Palette8bit, (uint)Image.Width, (uint)Image.Height);
+            return new PaletteImage_old(bytes, Imaging.PaletteImage_old.PixelFormat.Palette8bit, (uint)Image.Width, (uint)Image.Height);
         }
 
-        public static Image ConvertToPalette8bpp(System.Drawing.Image Image, FullPalette Palette)
+        public static PaletteImage_old ConvertToPalette8bpp(System.Drawing.Image Image, FullPalette Palette)
         {
             return ConvertToPalette8bpp(Image, Palette, null);
         }
 
-        private static Image ConvertToRGB16bpp(System.Drawing.Image Image, BackgroundWorker Worker)
+        private static PaletteImage_old ConvertToRGB16bpp(System.Drawing.Image Image, BackgroundWorker Worker)
         {
             var bmp = new Bitmap(Image);
             byte[] bytes = new byte[Image.Width * Image.Height * 2];
@@ -236,21 +238,21 @@ namespace Claw.Imaging
                     Worker.ReportProgress(y);
             }
 
-            return new Image(bytes, Imaging.Image.PixelFormat.RGB16bit, (uint)Image.Width, (uint)Image.Height);
+            return new PaletteImage_old(bytes, Imaging.PaletteImage_old.PixelFormat.RGB16bit, (uint)Image.Width, (uint)Image.Height);
         }
 
-        public static Image ConvertToRGB16bpp(System.Drawing.Image Image)
+        public static PaletteImage_old ConvertToRGB16bpp(System.Drawing.Image Image)
         {
             return ConvertToRGB16bpp(Image, null);
         }
 
         private class ConversionArgs
         {
-            public Image.PixelFormat TargetFormat;
+            public PaletteImage_old.PixelFormat TargetFormat;
             public System.Drawing.Image SourceImage;
             public IPalette Palette;
 
-            private ConversionArgs(Image.PixelFormat TargetFormat, System.Drawing.Image SourceImage, IPalette Palette)
+            private ConversionArgs(PaletteImage_old.PixelFormat TargetFormat, System.Drawing.Image SourceImage, IPalette Palette)
             {
                 this.TargetFormat = TargetFormat;
                 this.SourceImage = SourceImage;
@@ -259,28 +261,28 @@ namespace Claw.Imaging
 
             public static ConversionArgs Monochrome1bpp(System.Drawing.Image SourceImage)
             {
-                return new ConversionArgs(Image.PixelFormat.Monochrome1bit, SourceImage, null);
+                return new ConversionArgs(PaletteImage_old.PixelFormat.Monochrome1bit, SourceImage, null);
             }
 
             public static ConversionArgs Palette4bpp(System.Drawing.Image SourceImage, TinyPalette Palette)
             {
-                return new ConversionArgs(Image.PixelFormat.Palette4bit, SourceImage, Palette);
+                return new ConversionArgs(PaletteImage_old.PixelFormat.Palette4bit, SourceImage, Palette);
             }
 
             public static ConversionArgs Palette8bpp(System.Drawing.Image SourceImage, FullPalette Palette)
             {
-                return new ConversionArgs(Image.PixelFormat.Palette8bit, SourceImage, Palette);
+                return new ConversionArgs(PaletteImage_old.PixelFormat.Palette8bit, SourceImage, Palette);
             }
 
             public static ConversionArgs RGB16bpp(System.Drawing.Image SourceImage)
             {
-                return new ConversionArgs(Image.PixelFormat.RGB16bit, SourceImage, null);
+                return new ConversionArgs(PaletteImage_old.PixelFormat.RGB16bit, SourceImage, null);
             }
         }
 
         public class ProgressCompletedEventArgs : EventArgs
         {
-            public Image Result { get; private set; }
+            public PaletteImage_old Result { get; private set; }
             public bool Success { get; private set; }
             public TimeSpan TotalDuration { get; private set; }
 
@@ -289,7 +291,7 @@ namespace Claw.Imaging
                 Success = false;
             }
 
-            public ProgressCompletedEventArgs(Image Result, TimeSpan TotalDuration)
+            public ProgressCompletedEventArgs(PaletteImage_old Result, TimeSpan TotalDuration)
             {
                 Success = true;
                 this.Result = Result;
@@ -312,3 +314,4 @@ namespace Claw.Imaging
         }
     }
 }
+*/
