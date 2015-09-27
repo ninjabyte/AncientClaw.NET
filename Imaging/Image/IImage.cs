@@ -5,14 +5,14 @@ using System.Text;
 using Claw.Imaging.Palettes;
 using Claw.Imaging.Colorspaces;
 
-namespace Claw.Imaging
+namespace Claw.Imaging.Image
 {
     public interface IImage
     {
         uint Width { get; }
-        uint Height { set; }
+        uint Height { get; }
         IPalette Palette { get; set; }
-        PixelFormat Format { get; }
+        PaletteFormat Format { get; }
         byte[] Data { get; }
         byte this[uint Column, uint Row]
         {
@@ -20,6 +20,6 @@ namespace Claw.Imaging
             set;
         }
         RGB565 GetColorAt(uint Column, uint Row);
-        MemoryBitmap ToMemoryBitmap();
+        MemoryBitmap ToBitmap();
     }
 }

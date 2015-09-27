@@ -8,8 +8,7 @@ namespace Claw.Imaging.Palettes
 {
     public class TinyPalette : IPalette
     {
-        private RGB565[] rgb_entries;
-        private CIELab[] lab_entries;
+        private RGB565[] entries;
 
         public byte Size
         {
@@ -18,40 +17,20 @@ namespace Claw.Imaging.Palettes
 
         public TinyPalette()
         {
-            rgb_entries = new RGB565[16];
-            lab_entries = new CIELab[16];
+            entries = new RGB565[16];
         }
 
         public Colorspaces.RGB565 this[byte Index]
         {
             get
             {
-                return rgb_entries[(byte)(Index & 0x0F)];
+                return entries[(byte)(Index & 0x0F)];
             }
 
             set
             {
-                rgb_entries[(byte)(Index & 0x0F)] = value;
-                lab_entries[(byte)(Index & 0x0F)] = new CIELab(value.Color);
+                entries[(byte)(Index & 0x0F)] = value;
             }
-        }
-
-        public byte FindClosestEntry(System.Drawing.Color Color)
-        {
-            var searchColor = new CIELab(Color);
-            byte closestPaletteEntry = 0;
-            double closestDeltaE = 0d;
-
-            for (int i = 0; i < 16; i++) {
-                double deltaE = searchColor.CalculateDeltaE(lab_entries[i]);
-
-                if (Math.Abs(deltaE) < Math.Abs(closestDeltaE) || i == 0) {
-                    closestPaletteEntry = (byte)i;
-                    closestDeltaE = deltaE;
-                }
-            }
-
-            return closestPaletteEntry;
         }
     }
 }

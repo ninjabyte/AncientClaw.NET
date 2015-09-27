@@ -9,14 +9,14 @@ using Claw.Imaging.Palettes;
 
 namespace Claw.Imaging
 {
-    public class PaletteImage
+    public class PaletteImage_old
     {
         public PixelFormat Format { get; private set; }
         public uint Width { get; private set; }
         public uint Height { get; private set; }
         public byte[] Data { get; private set; } 
 
-        public PaletteImage(byte[] Bytes, PixelFormat Format, uint Width, uint Height)
+        public PaletteImage_old(byte[] Bytes, PixelFormat Format, uint Width, uint Height)
         {
             Data = Bytes;
             this.Format = Format;
@@ -24,7 +24,7 @@ namespace Claw.Imaging
             this.Height = Height;
         }
 
-        public PaletteImage FromStream(Stream Stream)
+        public PaletteImage_old FromStream(Stream Stream)
         {
             return null;
         }

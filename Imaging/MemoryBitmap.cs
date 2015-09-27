@@ -47,19 +47,39 @@ namespace Claw.Imaging
             PixelData = null;
         }
 
-        public RGB888 this[uint Column, uint Row]
+        public byte BytePerPixel { get { return (byte)(Math.Abs(BmpData.Stride) / BmpData.Width); } }
+
+        public uint Length { get { return (uint)(Width * Height * BytePerPixel); } }
+
+        public RGB888 this[uint Pointer]
         {
             get
             {
-                return new RGB888(GetByte(Column, Row, 1), GetByte(Column, Row, 2), GetByte(Column, Row, 3), GetByte(Column, Row, 0) > 127 ? false : true);
+                return new RGB888(PixelData[Pointer + 0], PixelData[Pointer + 1], PixelData[Pointer + 2], PixelData[Pointer + 3] > 127 ? false : true);
             }
 
             set
             {
-                SetByte(Column, Row, 1, value.R);
-                SetByte(Column, Row, 2, value.G);
-                SetByte(Column, Row, 3, value.B);
-                SetByte(Column, Row, 0, (byte)(value.Transparent ? 0 : 0xFF));
+                PixelData[Pointer + 0] = value.R;
+                PixelData[Pointer + 1] = value.G;
+                PixelData[Pointer + 2] = value.B;
+                PixelData[Pointer + 3] = (byte)(value.Transparent ? 0 : 0xFF);
+            }
+        }
+
+        public RGB888 this[uint Column, uint Row]
+        {
+            get
+            {
+                return new RGB888(GetByte(Column, Row, 0), GetByte(Column, Row, 1), GetByte(Column, Row, 2), GetByte(Column, Row, 3) > 127 ? false : true);
+            }
+
+            set
+            {
+                SetByte(Column, Row, 0, value.R);
+                SetByte(Column, Row, 1, value.G);
+                SetByte(Column, Row, 2, value.B);
+                SetByte(Column, Row, 3, (byte)(value.Transparent ? 0 : 0xFF));
             }
         }
 

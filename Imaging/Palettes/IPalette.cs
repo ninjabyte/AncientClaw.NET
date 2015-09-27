@@ -11,6 +11,5 @@ namespace Claw.Imaging.Palettes
     {
         byte Size { get; }
         RGB565 this[byte Index] { get; set; }
-        byte FindClosestEntry(Color Color);
     }
 }

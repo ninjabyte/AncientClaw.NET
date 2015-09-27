@@ -5,13 +5,13 @@ using System.Text;
 using System.Drawing;
 using System.Drawing.Imaging;
 using Claw.Imaging.Palettes;
+using Claw.Imaging.Colorspaces;
+using Claw.Imaging.Image;
 
 namespace Claw.Imaging
 {
-    public class ColorConverter
+    public static class ColorConverter
     {
-        private IPalette Palette;
-
         /* public ColorConverter(String ifile)
          {
              BufferedImage palImg = ImageIO.read(ColorConverter.class.getResource("/assets/palette.png"));
@@ -20,32 +20,81 @@ namespace Claw.Imaging
              width = srcImg.getWidth();
              height = srcImg.getHeight();
 		
-             pal = toPixelArray(palImg);
-             src = toPixelArray(srcImg);
-             dst = new int[src.length]; // the alpha component of the dst image is used to store the color's index on the palette.
+             pal = palette = toPixelArray(palImg);
+             src = sourceimage = toPixelArray(srcImg);
+             dst = destination = new int[src.length]; // the alpha component of the dst image is used to store the color's index on the palette.
          }*/
 
-        public ColorConverter(IPalette Palette)
-        {
-            
-
-           
-
-            this.Palette = Palette;
-        }
-
-        public void GenerateImage(System.Drawing.Image Image, IImage TargetImage)
+        public static void ConvertImage(System.Drawing.Image Image, IImage TargetImage)
         {
             var sourceBitmap = new MemoryBitmap(Image);
             sourceBitmap.Lock();
 
-            uint width = (uint)Image.Width;
-            uint height = (uint)Image.Height;
+            /*
+             * for (int i = 0; i < src.Length; i++) {
+              
+                int oldpixel = src[i];
+                int newpixel = getClosestColor(oldpixel);
 
+                dst[i] = newpixel;
+
+                int qe = ColorUtil.sub(oldpixel, newpixel);
+
+                addPix(src, x + 1, y, ColorUtil.mul(qe, 7 / 16f));
+                addPix(src, x - 1, y + 1, ColorUtil.mul(qe, 3 / 16f));
+                addPix(src, x, y + 1, ColorUtil.mul(qe, 5 / 16f));
+                addPix(src, x + 1, y + 1, ColorUtil.mul(qe, 1 / 16f));
+            }
             
+            return toImage(dst, width, height);
+             * */
 
-            return targetImage;
+            for (uint y = 0; y < sourceBitmap.Height; y++) {
+                for (uint x = 0; x < sourceBitmap.Width; x++) {
+                    RGB888 oldPixel = sourceBitmap[x, y];
+                    byte paletteColor = FindClosestPaletteEntry(oldPixel, TargetImage.Palette);
+                    RGB888 newPixel = new RGB888(TargetImage.Palette[paletteColor]);
+
+                    TargetImage[x, y] = paletteColor;
+
+                    //RGB888 qe = oldPixel.Subtract(newPixel);
+                }
+            }
+
         }
+
+        private static void AddPixel(MemoryBitmap Bitmap, uint X, uint Y, RGB888 Color)
+        {
+            if (Bitmap == null)
+                throw new ArgumentNullException("Bitmap");
+            if (Color == null)
+                throw new ArgumentNullException("Color");
+            if(X >= Bitmap.Width)
+                throw new ArgumentOutOfRangeException("X");
+            if (Y >= Bitmap.Height)
+                throw new ArgumentOutOfRangeException("Y");
+
+            Bitmap[X, Y] = Bitmap[X, Y].Add(Color);
+        }
+
+        private static byte FindClosestPaletteEntry(RGB888 Color, IPalette Palette)
+        {
+            int closestDst = int.MaxValue, dst;
+            byte palColor = 0;
+            
+            for (byte i = 0; i < Palette.Size; i++) {
+                dst = Color.SquareDifference(new RGB888(Palette[i]));
+
+                if (dst < closestDst) {
+                    closestDst = dst;
+                    palColor = i;
+                }
+            }
+
+            return palColor;
+        }
+
+        
 
         /*
 
@@ -66,28 +115,8 @@ namespace Claw.Imaging
                 addPix(src, x, y + 1, ColorUtil.mul(qe, 5 / 16f));
                 addPix(src, x + 1, y + 1, ColorUtil.mul(qe, 1 / 16f));
             }
-
+            
             return toImage(dst, width, height);
-        }
-
-        private void addPix(int[] img, int x, int y, int c)
-        {
-            if (x >= width || y >= height)
-                return;
-            img[y * width + x] = ColorUtil.add(img[y * width + x], c);
-        }
-
-        private int getClosestColor(int color)
-        {
-            int closestDst = int.MaxValue, col = 0, dst;
-
-            for (int i = 0; i < pal.Length; i++)
-                if ((dst = ColorUtil.getDifferenceSq(color, pal[i])) < closestDst) {
-                    closestDst = dst;
-                    col = i;
-                }
-
-            return ColorUtil.setAlpha(pal[col], col);
         }
 
         private int[] toPixelArray(Image img)

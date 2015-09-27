@@ -68,6 +68,24 @@ namespace Claw.Imaging.Colorspaces
             this.Color = Color;
         }
 
+        public RGB888(RGB565 Color)
+        {
+            this.R = Color.R;
+            this.G = Color.G;
+            this.B = Color.B;
+            this.Transparent = false;
+        }
+
+        public RGB565 ToRGB565()
+        {
+            return ToRGB565(this);
+        }
+
+        public static RGB565 ToRGB565(RGB888 Color)
+        {
+            return new RGB565((byte)(Color.R >> 3), (byte)(Color.G >> 2), (byte)(Color.B >> 3));
+        }
+
         private static uint Pack(byte R, byte G, byte B)
         {
             return (uint)((((uint)R) << 16) | (((uint)G) << 8) | ((uint)B));
@@ -204,6 +222,24 @@ namespace Claw.Imaging.Colorspaces
             Bout = ClampComponent(ScaleComponent((short)(UnscaleComponent(B0) * Multiplier)));
         }
 
+        public int SquareDifference(RGB888 Color)
+        {
+            return SquareDifference(this, Color);
+        }
+
+        public static int SquareDifference(RGB888 Color0, RGB888 Color1)
+        {
+            return SquareDifference(Color0.R, Color0.G, Color0.B, Color1.R, Color1.G, Color1.B);
+        }
+
+        public static int SquareDifference(byte R0, byte G0, byte B0, byte R1, byte G1, byte B1)
+        {
+            int r = R0 - R1;
+            int g = G0 - G1;
+            int b = B0 - B1;
+            return r * r + g * g + b * b;
+        }
+
         /// <summary>
         /// Scales an unscaled component to a [-256...256] range.
         /// </summary>
@@ -222,14 +258,6 @@ namespace Claw.Imaging.Colorspaces
         private static byte UnscaleComponent(short ScaledComponent)
         {
             return (byte)ClampComponent((short)(ScaledComponent / 2 + 128));
-        }
-
-        public static int ColorDifferenceSqare(byte R0, byte G0, byte B0, byte R1, byte G1, byte B1)
-        {
-            int r = R0 - R1;
-            int g = G0 - G1;
-            int b = B0 - B1;
-            return r * r + g * g + b * b;
         }
 
         private static byte ClampComponent(short Component)

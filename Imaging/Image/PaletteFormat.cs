@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Claw.Imaging
+namespace Claw.Imaging.Image
 {
-    public enum PixelFormat : byte
+    public enum PaletteFormat : byte
     {
         Palette1bit,
         Palette2bit,
