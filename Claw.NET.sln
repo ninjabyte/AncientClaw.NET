@@ -1,9 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Claw.NET", "Claw.NET.csproj", "{3A948600-3D09-4303-88C7-B7E4054D2961}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Claw.NET", "Claw.NET\Claw.NET.csproj", "{3A948600-3D09-4303-88C7-B7E4054D2961}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Claw.NET Demo", "..\Claw.NET Demo\Claw.NET Demo.csproj", "{6F5011BB-12E5-49B9-B714-0D47104CE692}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Claw.NET Demo", "Claw.NET Demo\Claw.NET Demo.csproj", "{6F5011BB-12E5-49B9-B714-0D47104CE692}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

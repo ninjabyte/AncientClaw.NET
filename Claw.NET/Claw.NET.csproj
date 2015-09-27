@@ -49,7 +49,6 @@
     <Compile Include="Imaging\Colorspaces\RGB888.cs" />
     <Compile Include="Imaging\Image\IImage.cs" />
     <Compile Include="Imaging\Image\PaletteImage8.cs" />
-    <None Include="Imaging\PaletteImage_old.cs" />
     <Compile Include="Imaging\ImageConverter.cs" />
     <Compile Include="Imaging\MemoryBitmap.cs" />
     <Compile Include="Imaging\Palettes\TinyPalette.cs" />
