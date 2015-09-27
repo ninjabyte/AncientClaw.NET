@@ -111,6 +111,11 @@ namespace Claw.Imaging.Colorspaces
             return PackValueFromRGB888(Color.R, Color.G, Color.B);
         }
 
+        public static ushort PackValueFromColor888(RGB888 Color)
+        {
+            return PackValueFromRGB888(Color.R, Color.G, Color.B);
+        }
+
         public static ushort PackValueFromRGB888(byte R, byte G, byte B)
         {
             return Pack((byte)(R >> 3), (byte)(G >> 2), (byte)(B >> 3));
@@ -130,6 +135,17 @@ namespace Claw.Imaging.Colorspaces
             b = (byte)(b << 3);
 
             return Color.FromArgb(r, g, b);
+        }
+
+        public static RGB888 UnpackValueToColor888(ushort Value)
+        {
+            byte r, g, b;
+            Unpack(Value, out r, out g, out b);
+            r = (byte)(r << 3);
+            g = (byte)(g << 2);
+            b = (byte)(b << 3);
+
+            return new RGB888(r, g, b);
         }
 
         public static void UnpackValueToRGB888(ushort Value, out byte R, out byte G, out byte B)
