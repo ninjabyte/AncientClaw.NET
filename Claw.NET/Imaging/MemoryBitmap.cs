@@ -14,6 +14,7 @@ namespace Claw.Imaging
         public uint Height { get { return (uint)BitmapImage.Height; } }
         public uint Width { get { return (uint)BitmapImage.Width; } }
         private BitmapData BmpData { get; set; }
+        private uint AbsStride;
         private byte[] PixelData;
 
         public MemoryBitmap(System.Drawing.Image SourceImage)
@@ -32,7 +33,8 @@ namespace Claw.Imaging
         public void Lock()
         {
             BmpData = BitmapImage.LockBits(new Rectangle(0, 0, BitmapImage.Width, BitmapImage.Height), ImageLockMode.ReadWrite, PixelFormat.Format32bppArgb);
-            PixelData = new byte[Math.Abs(BmpData.Stride) * BmpData.Height];
+            AbsStride = (uint)Math.Abs(BmpData.Stride);
+            PixelData = new byte[AbsStride * BmpData.Height];
             System.Runtime.InteropServices.Marshal.Copy(BmpData.Scan0, PixelData, 0, PixelData.Length);
         }
 
@@ -45,25 +47,23 @@ namespace Claw.Imaging
             BitmapImage.UnlockBits(BmpData);
             BmpData = null;
             PixelData = null;
+            AbsStride = 0;
         }
 
-        public byte BytePerPixel { get { return (byte)(Math.Abs(BmpData.Stride) / BmpData.Width); } }
+        public byte BytePerPixel { get { return (byte)(AbsStride / BmpData.Width); } }
 
         public uint Length { get { return (uint)(Width * Height * BytePerPixel); } }
 
-        public RGB888 this[uint Pointer]
+        public byte this[uint Pointer]
         {
             get
             {
-                return new RGB888(PixelData[Pointer + 0], PixelData[Pointer + 1], PixelData[Pointer + 2], PixelData[Pointer + 3] > 127 ? false : true);
+                return PixelData[Pointer];
             }
 
             set
             {
-                PixelData[Pointer + 0] = value.R;
-                PixelData[Pointer + 1] = value.G;
-                PixelData[Pointer + 2] = value.B;
-                PixelData[Pointer + 3] = (byte)(value.Transparent ? 0 : 0xFF);
+                PixelData[Pointer] = value;
             }
         }
 
@@ -83,14 +83,30 @@ namespace Claw.Imaging
             }
         }
 
-        private byte GetByte(uint Column, uint Row, byte Offset)
+        public void GetRGBA(uint Column, uint Row, out byte R, out byte G, out byte B, out byte A)
         {
-            return PixelData[Row * Math.Abs(BmpData.Stride) + (Column * 4) + Offset];
+            R = PixelData[Row * AbsStride + (Column * 4)];
+            G = PixelData[Row * AbsStride + (Column * 4) + 1];
+            B = PixelData[Row * AbsStride + (Column * 4) + 2];
+            A = PixelData[Row * AbsStride + (Column * 4) + 3];
         }
 
-        private void SetByte(uint Column, uint Row, byte Offset, byte Value)
+        public void SetRGBA(uint Column, uint Row, byte R, byte G, byte B, byte A)
         {
-            PixelData[Row * Math.Abs(BmpData.Stride) + (Column * 4) + Offset] = Value;
+            PixelData[Row * AbsStride + (Column * 4)] = R;
+            PixelData[Row * AbsStride + (Column * 4) + 1] = G;
+            PixelData[Row * AbsStride + (Column * 4) + 2] = B;
+            PixelData[Row * AbsStride + (Column * 4) + 3] = A;
+        }
+
+        public byte GetByte(uint Column, uint Row, byte Offset)
+        {
+            return PixelData[Row * AbsStride + (Column * 4) + Offset];
+        }
+
+        public void SetByte(uint Column, uint Row, byte Offset, byte Value)
+        {
+            PixelData[Row * AbsStride + (Column * 4) + Offset] = Value;
         }
 
         public void Dispose()

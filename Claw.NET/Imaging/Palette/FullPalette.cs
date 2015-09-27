@@ -6,7 +6,7 @@ using System.Drawing;
 using Claw.Imaging.Colorspaces;
 using System.Resources;
 
-namespace Claw.Imaging.Palettes
+namespace Claw.Imaging.Palette
 {
     public class FullPalette : IPalette
     {
@@ -18,7 +18,7 @@ namespace Claw.Imaging.Palettes
         {
             get
             {
-                return new FullPalette(System.Drawing.Image.FromStream(typeof(FullPalette).Assembly.GetManifestResourceStream("Claw.Imaging.Palettes.Color.bmp")));
+                return new FullPalette(System.Drawing.Image.FromStream(typeof(FullPalette).Assembly.GetManifestResourceStream("Claw.Imaging.Palette.Palette.png")));
             }
         }
 

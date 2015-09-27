@@ -118,6 +118,13 @@ namespace Claw.Imaging.Colorspaces
             return Pack((byte)((R & 0x1F) << 3), (byte)((G & 0x3F) << 2), (byte)((B & 0x1F) << 3));
         }
 
+        public static void UnpackValueFromRGB565(RGB565 Color, out byte Rout, out byte Gout, out byte Bout)
+        {
+            Rout = (byte)(Color.R << 3);
+            Gout = (byte)(Color.G << 2);
+            Bout = (byte)(Color.B << 3);
+        }
+
         public static Color UnpackValueToColor(uint Value)
         {
             byte r, g, b;
@@ -155,6 +162,11 @@ namespace Claw.Imaging.Colorspaces
             Add(R, G, B, R1, G1, B1, out Rout, out Gout, out Bout);
         }
 
+        public RGB888 Add(byte R, byte G, byte B)
+        {
+            return Add(this, R, G, B);
+        }
+
         public RGB888 Add(RGB888 Color)
         {
             return Add(this, Color);
@@ -165,6 +177,13 @@ namespace Claw.Imaging.Colorspaces
             byte r, g, b;
             Add(Color0.R, Color0.G, Color0.B, Color1.R, Color1.G, Color1.B, out r, out g, out b);
             return new RGB888(r, g, b, Color0.Transparent || Color1.Transparent);
+        }
+
+        public static RGB888 Add(RGB888 Color0, byte R1, byte G1, byte B1)
+        {
+            byte r, g, b;
+            Add(Color0.R, Color0.G, Color0.B, R1, G1, B1, out r, out g, out b);
+            return new RGB888(r, g, b, Color0.Transparent);
         }
 
         public static void Add(byte R0, byte G0, byte B0, byte R1, byte G1, byte B1, out byte Rout, out byte Gout, out byte Bout)
@@ -217,9 +236,9 @@ namespace Claw.Imaging.Colorspaces
 
         public static void Multiply(byte R0, byte G0, byte B0, float Multiplier, out byte Rout, out byte Gout, out byte Bout)
         {
-            Rout = ClampComponent(ScaleComponent((short)(UnscaleComponent(R0) * Multiplier)));
-            Gout = ClampComponent(ScaleComponent((short)(UnscaleComponent(G0) * Multiplier)));
-            Bout = ClampComponent(ScaleComponent((short)(UnscaleComponent(B0) * Multiplier)));
+            Rout = (((byte)(UnscaleComponent(R0) * Multiplier)));
+            Gout = (((byte)(UnscaleComponent(G0) * Multiplier)));
+            Bout = (((byte)(UnscaleComponent(B0) * Multiplier)));
         }
 
         public int SquareDifference(RGB888 Color)

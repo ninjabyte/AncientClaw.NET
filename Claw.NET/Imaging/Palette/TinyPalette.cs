@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using Claw.Imaging.Colorspaces;
 
-namespace Claw.Imaging.Palettes
+namespace Claw.Imaging.Palette
 {
     public class TinyPalette : IPalette
     {

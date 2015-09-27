@@ -5,7 +5,7 @@ using System.Text;
 using System.Drawing;
 using Claw.Imaging.Colorspaces;
 
-namespace Claw.Imaging.Palettes
+namespace Claw.Imaging.Palette
 {
     public interface IPalette
     {

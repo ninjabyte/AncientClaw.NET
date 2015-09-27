@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Claw.Imaging.Palettes;
+using Claw.Imaging.Palette;
 using Claw.Imaging.Colorspaces;
 
 namespace Claw.Imaging.Image
